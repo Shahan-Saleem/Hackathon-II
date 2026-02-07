@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  hackathon-app:
+    build: .
+    ports:
+      - "5000:5000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=your-super-secret-key-change-in-production
+    command: python web_app.py
+    restart: unless-stopped
+
+volumes:
+  data:

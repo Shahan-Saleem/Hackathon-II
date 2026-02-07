@@ -1,0 +1,162 @@
+openapi: 3.0.0
+info:
+  title: Persistence API for Task Management
+  description: API contracts for persistent storage operations in the task management system
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /persistence/load:
+    post:
+      summary: Load persisted task data
+      description: Attempts to load task data from persistent storage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadRequest'
+      responses:
+        '200':
+          description: Successfully loaded persisted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to load persisted data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /persistence/save:
+    post:
+      summary: Save task data to persistent storage
+      description: Persists the current task state to storage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveRequest'
+      responses:
+        '200':
+          description: Successfully saved data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveResponse'
+        '400':
+          description: Invalid request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Failed to save data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    LoadRequest:
+      type: object
+      properties:
+        filePath:
+          type: string
+          description: Path to the persistence file
+          default: "./tasks.json"
+      required:
+        - filePath
+
+    LoadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the load operation was successful
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+          description: Loaded task data
+        message:
+          type: string
+          description: Additional information about the operation
+
+    SaveRequest:
+      type: object
+      properties:
+        filePath:
+          type: string
+          description: Path to the persistence file
+          default: "./tasks.json"
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+          description: Tasks to persist
+      required:
+        - filePath
+        - tasks
+
+    SaveResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the save operation was successful
+        message:
+          type: string
+          description: Additional information about the operation
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the task
+        description:
+          type: string
+          description: Text description of the task
+        completed:
+          type: boolean
+          description: Status indicator for task completion
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp of task creation
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp of last task update
+      required:
+        - id
+        - description
+        - completed
+        - created_at
+        - updated_at
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: string
+          description: Additional error details

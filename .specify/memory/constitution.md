@@ -1,55 +1,46 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- SYNC IMPACT REPORT:
+Version change: N/A → 1.0.0
+Added sections: All sections (new constitution)
+Removed sections: None
+Templates requiring updates: N/A (new file)
+Follow-up TODOs: None
+-->
+
+# In-Memory Python Console Todo App Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Spec-Driven Development Principle
+No code may be generated before the spec is complete. Claude Code or AI agents MUST implement only what is in the approved spec. Manual coding is strictly forbidden.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Determinism and Traceability
+All outputs MUST be deterministic. All AI agent actions MUST be traceable back to the spec. No improvisation or hallucinated behaviors are allowed.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Progressive Evolution Principle
+Phase I is the foundation; principles MUST enable future growth without violating Phase I contracts. Changes to core Phase I behaviors MUST be explicitly authorized via Constitution revision.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Separation of Responsibility
+Input, processing, and output MUST be clearly separated. AI agents MAY execute tasks but MUST NOT redefine responsibilities. Users, AI agents, and in-memory storage MUST operate within defined boundaries.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Statelessness as Default
+Even though Phase I is in-memory, all state logic MUST be explicit and clearly recoverable. Hidden or implicit state is forbidden.
 
-### [PRINCIPLE_6_NAME]
+### User Ownership & Isolation
+Each user's tasks MUST be isolated. No cross-user data access is allowed.
 
+### AI as Executor, Not Designer
+AI MUST follow specs for task creation, update, deletion, listing, and completion. AI MUST NOT invent features or behaviors outside the approved Phase I spec.
 
-[PRINCIPLE__DESCRIPTION]
+### Change Control Principle
+Phase I principles are immutable unless explicitly revised in `/sp.constitution.md`. Silent modifications or workarounds are strictly prohibited.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Precedence & Enforcement
+Constitution > Phase I Specs > Tasks > Implementation. Any violation invalidates the Phase I implementation.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Purpose of the Constitution
+This Constitution defines the immutable laws and non-negotiable principles that govern the design, evolution, and AI interaction for Phase I of the In-Memory Python Console Todo App. This document establishes the authority of principles over all specifications and code for this phase.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This Constitution serves as the ultimate authority governing all aspects of Phase I development. All implementations, specifications, and AI agent actions MUST comply with these principles. Any amendments to this Constitution require explicit revision and must be documented in the version control system. All development activities must verify compliance with constitutional principles.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-01-31 | **Last Amended**: 2026-01-31

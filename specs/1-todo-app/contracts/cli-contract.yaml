@@ -1,0 +1,101 @@
+# API Contracts: Phase I - In-Memory Python Console Todo App
+
+**Feature**: Phase I - In-Memory Python Console Todo App
+**Date**: 2026-01-31
+
+## CLI Command Interface Specification
+
+### Command: ADD_TASK
+- **Command Format**: `python implementation.py add --title "Task Title" [--description "Task Description"] [--user "user123"]`
+- **Required Parameters**:
+  - `--title` (str): Task title (required, non-empty)
+- **Optional Parameters**:
+  - `--description` (str): Task description (can be empty)
+  - `--user` (str): User identifier (defaults to 'default_user')
+- **Response**: Confirmation message with new task ID
+- **Success Scenario**: Creates new incomplete task and returns confirmation
+- **Error Scenarios**:
+  - Empty title: Returns error message
+  - Invalid user format: Returns error message
+
+### Command: UPDATE_TASK
+- **Command Format**: `python implementation.py update --id 1 --title "New Title" [--description "New Description"] [--user "user123"]`
+- **Required Parameters**:
+  - `--id` (int): Task ID to update (required)
+  - `--title` (str): New task title (required, non-empty)
+- **Optional Parameters**:
+  - `--description` (str): New task description (can be empty)
+  - `--user` (str): User identifier (defaults to 'default_user')
+- **Response**: Confirmation message of update
+- **Success Scenario**: Updates existing task properties and returns confirmation
+- **Error Scenarios**:
+  - Task ID not found: Returns error message
+  - Empty title: Returns error message
+  - User doesn't own task: Returns error message
+
+### Command: DELETE_TASK
+- **Command Format**: `python implementation.py delete --id 1 [--user "user123"]`
+- **Required Parameters**:
+  - `--id` (int): Task ID to delete (required)
+- **Optional Parameters**:
+  - `--user` (str): User identifier (defaults to 'default_user')
+- **Response**: Confirmation message of deletion
+- **Success Scenario**: Removes task from user's list and returns confirmation
+- **Error Scenarios**:
+  - Task ID not found: Returns error message
+  - User doesn't own task: Returns error message
+
+### Command: COMPLETE_TASK
+- **Command Format**: `python implementation.py complete --id 1 [--user "user123"]`
+- **Required Parameters**:
+  - `--id` (int): Task ID to mark as complete (required)
+- **Optional Parameters**:
+  - `--user` (str): User identifier (defaults to 'default_user')
+- **Response**: Confirmation message of completion
+- **Success Scenario**: Marks task as completed and returns confirmation
+- **Error Scenarios**:
+  - Task ID not found: Returns error message
+  - User doesn't own task: Returns error message
+
+### Command: LIST_TASKS
+- **Command Format**: `python implementation.py list [--user "user123"]`
+- **Optional Parameters**:
+  - `--user` (str): User identifier (defaults to 'default_user')
+- **Response**: Formatted list of tasks with completion status
+- **Success Scenario**: Displays all tasks for user with their status
+- **Error Scenarios**: None (returns empty list if no tasks)
+
+## Data Models
+
+### Task Object
+```
+{
+  "id": int,
+  "title": string,
+  "description": string,
+  "completed": boolean,
+  "created_by": string
+}
+```
+
+### Response Format
+```
+{
+  "status": "success" | "error",
+  "message": string,
+  "data": object (optional)
+}
+```
+
+## Validation Rules
+
+### Input Validation
+- Task title must be non-empty string
+- Task ID must be positive integer
+- User ID must be valid string identifier
+- All required parameters must be provided
+
+### Business Logic Validation
+- User can only operate on their own tasks
+- Task ID must exist for update/delete/complete operations
+- Task cannot be updated to have empty title

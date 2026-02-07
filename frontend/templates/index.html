@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TODE APP</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>TODE APP</h1>
+                <div class="user-info">
+                    <span id="username-display">Loading...</span>
+                    <button id="signout-btn" class="btn btn-secondary">Sign Out</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="navigation">
+            <ul>
+                <li><a href="#" id="dashboard-link" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" id="projects-link" class="nav-link">Projects</a></li>
+                <li><a href="#" id="tasks-link" class="nav-link">Tasks</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total Projects</h3>
+                        <p id="total-projects">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Tasks</h3>
+                        <p id="total-tasks">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Completed Tasks</h3>
+                        <p id="completed-tasks">0</p>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h2>Recent Activity</h2>
+                    <div id="recent-activity-list">
+                        <!-- Recent activity will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects View -->
+            <div id="projects-view" class="view">
+                <div class="section-header">
+                    <h2>Your Projects</h2>
+                    <button id="create-project-btn" class="btn btn-primary">Create Project</button>
+                </div>
+
+                <div id="projects-list">
+                    <!-- Projects will be populated here -->
+                </div>
+
+                <!-- Create Project Modal -->
+                <div id="create-project-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Create New Project</h3>
+                        <form id="create-project-form">
+                            <div class="form-group">
+                                <label for="project-name">Project Name</label>
+                                <input type="text" id="project-name" name="name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks View -->
+            <div id="tasks-view" class="view">
+                <div class="section-header">
+                    <h2>Your Tasks</h2>
+                    <div>
+                        <select id="project-select" class="form-control">
+                            <option value="">Select a project</option>
+                            <!-- Projects will be populated here -->
+                        </select>
+                        <button id="create-task-btn" class="btn btn-primary">Add Task</button>
+                    </div>
+                </div>
+
+                <div id="tasks-list">
+                    <!-- Tasks will be populated here -->
+                </div>
+
+                <!-- Create Task Modal -->
+                <div id="create-task-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Add New Task</h3>
+                        <form id="create-task-form">
+                            <div class="form-group">
+                                <label for="task-title">Task Title</label>
+                                <input type="text" id="task-title" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="task-description">Description</label>
+                                <textarea id="task-description" name="description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="task-project">Project</label>
+                                <select id="task-project" name="project_id" required>
+                                    <option value="">Select a project</option>
+                                    <!-- Projects will be populated here -->
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Task</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="message" class="message hidden"></div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

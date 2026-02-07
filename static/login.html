@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Sign In / Sign Up</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container sign-in-container">
+            <form id="signInForm">
+                <h1>Sign In</h1>
+                <div class="social-container">
+                    <a href="/login/google" class="social" id="googleSignIn">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="/login/facebook" class="social" id="facebookSignIn">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="/login/github" class="social" id="githubSignIn">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+                <span>or use your account</span>
+                <input type="text" placeholder="Username or Email" id="signInUsername" required />
+                <div class="password-container">
+                    <input type="password" placeholder="Password" id="signInPassword" required />
+                    <span class="password-toggle" id="signInToggle">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <a href="#" id="forgotPassword">Forgot your password?</a>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <div class="form-container sign-up-container">
+            <form id="signUpForm">
+                <h1>Create Account</h1>
+                <div class="social-container">
+                    <a href="/login/google" class="social" id="googleSignUp">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="/login/facebook" class="social" id="facebookSignUp">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="/login/github" class="social" id="githubSignUp">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" placeholder="Username" id="signUpUsername" required />
+                <input type="email" placeholder="Email" id="signUpEmail" required />
+                <div class="password-container">
+                    <input type="password" placeholder="Password" id="signUpPassword" required />
+                    <span class="password-toggle" id="signUpToggle">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <div class="password-container">
+                    <input type="password" placeholder="Confirm Password" id="signUpConfirmPassword" required />
+                    <span class="password-toggle" id="signUpConfirmToggle">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start your journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container" style="display: none;">
+        <div id="messageContent" class="message-content"></div>
+    </div>
+
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Check for error in URL parameters and show it
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = getUrlParameter('error');
+            if (errorMessage) {
+                // Remove the error parameter from URL to avoid showing it again on refresh
+                const newUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState(null, null, newUrl);
+
+                // Show the error message
+                showMessage(errorMessage, 'error');
+            }
+        });
+
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageContent = document.getElementById('messageContent');
+
+            // Remove existing classes
+            messageContent.className = 'message-content';
+
+            // Add appropriate class based on type
+            switch(type) {
+                case 'success':
+                    messageContent.classList.add('message-success');
+                    break;
+                case 'error':
+                    messageContent.classList.add('message-error');
+                    break;
+                case 'info':
+                    messageContent.classList.add('message-info');
+                    break;
+                default:
+                    messageContent.classList.add('message-info');
+            }
+
+            messageContent.textContent = message;
+            messageContainer.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageContainer.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+
+    <script src="/static/js/login.js"></script>
+</body>
+</html>

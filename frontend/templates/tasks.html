@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Task Manager</h1>
+            <div class="header-actions">
+                <button onclick="goBack()" class="btn btn-secondary">← Back to Dashboard</button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <div class="tasks-content">
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h2>Tasks</h2>
+                    <button id="newTaskBtn" class="btn btn-primary">Add Task</button>
+                </div>
+
+                <div id="newTaskForm" class="form-container" style="display: none;">
+                    <h3>Add New Task</h3>
+                    <form id="createTaskForm">
+                        <div class="form-group">
+                            <label for="taskTitle">Task Title</label>
+                            <input type="text" id="taskTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskDescription">Description</label>
+                            <textarea id="taskDescription" name="description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="taskCompleted" name="completed"> Completed
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Task</button>
+                        <button type="button" id="cancelTaskBtn" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+
+                <div id="tasksList" class="tasks-list">
+                    <!-- Tasks will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        const projectId = '{{ project_id }}';
+
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/me', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const result = await response.json();
+                document.querySelector('#welcomeMessage').textContent = `Welcome, ${result.user.username}!`;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        // Load tasks for the project
+        async function loadTasks() {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/tasks`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load tasks');
+                }
+
+                const result = await response.json();
+                const tasksContainer = document.getElementById('tasksList');
+
+                if (result.tasks.length === 0) {
+                    tasksContainer.innerHTML = '<p>No tasks yet. Add your first task!</p>';
+                    return;
+                }
+
+                tasksContainer.innerHTML = '';
+                result.tasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-card ${task.completed ? 'completed' : ''}`;
+                    taskElement.innerHTML = `
+                        <div class="task-content">
+                            <h3>${task.title}</h3>
+                            <p>${task.description || 'No description'}</p>
+                            <div class="task-meta">
+                                <span>Created: ${new Date(task.created_at).toLocaleDateString()}</span>
+                                ${task.completed ? '<span class="status-completed">✓ Completed</span>' : '<span class="status-pending">○ Pending</span>'}
+                            </div>
+                        </div>
+                        <div class="task-actions">
+                            <button onclick="toggleTask(${task.id})" class="btn ${task.completed ? 'btn-secondary' : 'btn-success'}">
+                                ${task.completed ? 'Mark Pending' : 'Complete'}
+                            </button>
+                            <button onclick="deleteTask(${task.id})" class="btn btn-danger">Delete</button>
+                        </div>
+                    `;
+                    tasksContainer.appendChild(taskElement);
+                });
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                document.getElementById('tasksList').innerHTML = '<p>Error loading tasks. Please refresh the page.</p>';
+            }
+        }
+
+        // Add task
+        async function addTask(formData) {
+            try {
+                const taskData = Object.fromEntries(formData);
+                taskData.completed = taskData.completed === 'on'; // Convert checkbox to boolean
+
+                const response = await fetch(`/api/projects/${projectId}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'credentials': 'include'
+                    },
+                    body: JSON.stringify(taskData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('createTaskForm').reset();
+                    document.getElementById('newTaskForm').style.display = 'none';
+                    loadTasks(); // Reload tasks
+                } else {
+                    alert(result.error || 'Failed to add task');
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+                alert('An error occurred while adding the task');
+            }
+        }
+
+        // Toggle task completion
+        async function toggleTask(taskId) {
+            try {
+                const response = await fetch(`/api/projects/${projectId}/tasks/${taskId}/toggle`, {
+                    method: 'PUT',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    loadTasks(); // Reload tasks
+                } else {
+                    const result = await response.json();
+                    alert(result.error || 'Failed to update task');
+                }
+            } catch (error) {
+                console.error('Error toggling task:', error);
+                alert('An error occurred while updating the task');
+            }
+        }
+
+        // Delete task
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    loadTasks(); // Reload tasks
+                } else {
+                    const result = await response.json();
+                    alert(result.error || 'Failed to delete task');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                alert('An error occurred while deleting the task');
+            }
+        }
+
+        // Go back to dashboard
+        function goBack() {
+            window.location.href = '/dashboard';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', async function() {
+                try {
+                    await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    window.location.href = '/login';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                    window.location.href = '/login';
+                }
+            });
+
+            // New task button
+            document.getElementById('newTaskBtn').addEventListener('click', function() {
+                document.getElementById('newTaskForm').style.display = 'block';
+            });
+
+            // Cancel task button
+            document.getElementById('cancelTaskBtn').addEventListener('click', function() {
+                document.getElementById('newTaskForm').style.display = 'none';
+                document.getElementById('createTaskForm').reset();
+            });
+
+            // Create task form
+            document.getElementById('createTaskForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addTask(new FormData(this));
+            });
+        });
+    </script>
+</body>
+</html>

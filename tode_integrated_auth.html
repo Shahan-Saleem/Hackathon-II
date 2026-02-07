@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODE APP - Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 440px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder {
+            color: #a0aec0;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #718096;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin: 15px 0 20px 0;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 25px;
+            color: #718096;
+            font-size: 15px;
+        }
+
+        .toggle-form a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .toggle-form a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            background: #48bb78;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .form-container {
+            transition: all 0.3s ease;
+        }
+
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">TODE APP</div>
+
+        <div class="success-message" id="globalMessage"></div>
+
+        <!-- Sign In Form -->
+        <form id="signInForm">
+            <h2 class="form-title">Sign In</h2>
+
+            <div class="form-group">
+                <label for="signInEmail">Email / Username</label>
+                <input type="text" id="signInEmail" placeholder="Enter your email or username" required>
+                <span class="error-message" id="signInEmailError">Please enter a valid email or username</span>
+            </div>
+
+            <div class="form-group">
+                <label for="signInPassword">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="signInPassword" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('signInPassword', this)">
+                        👁️
+                    </button>
+                </div>
+                <span class="error-message" id="signInPasswordError">Please enter your password</span>
+            </div>
+
+            <button type="submit" class="submit-btn" id="signInBtn">Sign In</button>
+
+            <div class="forgot-password">
+                <a href="#" onclick="showForgotPassword(); return false;">Forgot Password?</a>
+            </div>
+
+            <div class="toggle-form">
+                Don't have an account? <a href="#" onclick="toggleForms(); return false;">Sign Up</a>
+            </div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="signUpForm" class="hidden">
+            <h2 class="form-title">Register</h2>
+
+            <div class="form-group">
+                <label for="signUpName">Full Name</label>
+                <input type="text" id="signUpName" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signUpEmail">Email</label>
+                <input type="email" id="signUpEmail" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signUpUsername">Username</label>
+                <input type="text" id="signUpUsername" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="signUpPassword">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="signUpPassword" placeholder="Create a password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('signUpPassword', this)">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="signUpConfirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="signUpConfirmPassword" placeholder="Confirm your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('signUpConfirmPassword', this)">
+                        👁️
+                    </button>
+                </div>
+                <span class="error-message" id="passwordMatchError">Passwords do not match</span>
+            </div>
+
+            <button type="submit" class="submit-btn" id="signUpBtn">Sign Up</button>
+
+            <div class="toggle-form">
+                Already have an account? <a href="#" onclick="toggleForms(); return false;">Sign In</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Toggle between Sign In and Sign Up forms
+        function toggleForms() {
+            const signInForm = document.getElementById('signInForm');
+            const signUpForm = document.getElementById('signUpForm');
+            const globalMessage = document.getElementById('globalMessage');
+
+            // Hide success message when switching
+            globalMessage.style.display = 'none';
+
+            // Toggle forms with smooth transition
+            signInForm.classList.toggle('hidden');
+            signUpForm.classList.toggle('hidden');
+
+            // Reset forms
+            signInForm.reset();
+            signUpForm.reset();
+
+            // Reset password toggle icons
+            resetPasswordIcons();
+
+            // Clear any error messages
+            clearAllErrors();
+        }
+
+        // Reset password toggle icons to default
+        function resetPasswordIcons() {
+            const toggleButtons = document.querySelectorAll('.password-toggle');
+            toggleButtons.forEach(button => {
+                button.textContent = '👁️';
+            });
+        }
+
+        // Clear all error messages
+        function clearAllErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => {
+                element.style.display = 'none';
+            });
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // Show global message
+        function showGlobalMessage(message, isError = false) {
+            const globalMessage = document.getElementById('globalMessage');
+            globalMessage.textContent = message;
+            globalMessage.style.backgroundColor = isError ? '#e53e3e' : '#48bb78';
+            globalMessage.style.display = 'block';
+
+            // Hide after 5 seconds
+            setTimeout(() => {
+                globalMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // Handle Sign In
+        document.getElementById('signInForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const emailOrUsername = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+            const signInBtn = document.getElementById('signInBtn');
+
+            // Disable button and show loading
+            signInBtn.disabled = true;
+            signInBtn.textContent = 'Signing In...';
+
+            try {
+                const response = await fetch('/api/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: emailOrUsername, // Using username field to accept both email and username
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showGlobalMessage('Successfully signed in! Redirecting...', false);
+
+                    // Redirect to dashboard after delay
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    // Show specific error message from backend
+                    showGlobalMessage(data.error || 'Invalid email or password', true);
+                }
+            } catch (error) {
+                showGlobalMessage('Network error. Please try again.', true);
+            } finally {
+                // Re-enable button
+                signInBtn.disabled = false;
+                signInBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Handle Sign Up
+        document.getElementById('signUpForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('signUpName').value;
+            const email = document.getElementById('signUpEmail').value;
+            const username = document.getElementById('signUpUsername').value;
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = document.getElementById('signUpConfirmPassword').value;
+            const signUpBtn = document.getElementById('signUpBtn');
+
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                showGlobalMessage('Passwords do not match', true);
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showGlobalMessage('Please enter a valid email address', true);
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 8) {
+                showGlobalMessage('Password must be at least 8 characters long', true);
+                return;
+            }
+
+            // Disable button and show loading
+            signUpBtn.disabled = true;
+            signUpBtn.textContent = 'Creating Account...';
+
+            try {
+                const response = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showGlobalMessage('Account created successfully! Please sign in.', false);
+
+                    // Clear password fields
+                    document.getElementById('signUpPassword').value = '';
+                    document.getElementById('signUpConfirmPassword').value = '';
+
+                    // Switch to sign in form after delay
+                    setTimeout(() => {
+                        toggleForms();
+                    }, 2000);
+                } else {
+                    // Show specific error message from backend
+                    showGlobalMessage(data.error || 'Registration failed', true);
+                }
+            } catch (error) {
+                showGlobalMessage('Network error. Please try again.', true);
+            } finally {
+                // Re-enable button
+                signUpBtn.disabled = false;
+                signUpBtn.textContent = 'Sign Up';
+            }
+        });
+
+        // Show forgot password alert
+        function showForgotPassword() {
+            alert('Password reset functionality would be implemented here');
+        }
+
+        // Add input validation for email format
+        document.getElementById('signUpEmail').addEventListener('input', function(e) {
+            const email = e.target.value;
+            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (email && !isValid) {
+                e.target.style.borderColor = '#e53e3e';
+            } else {
+                e.target.style.borderColor = '#e2e8f0';
+            }
+        });
+
+        // Add input validation for password match
+        document.getElementById('signUpConfirmPassword').addEventListener('input', function(e) {
+            const password = document.getElementById('signUpPassword').value;
+            const confirmPassword = e.target.value;
+            const passwordMatchError = document.getElementById('passwordMatchError');
+
+            if (confirmPassword && password !== confirmPassword) {
+                passwordMatchError.style.display = 'block';
+            } else {
+                passwordMatchError.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
